@@ -1,0 +1,103 @@
+import cv2
+import numpy as np
+import time
+
+cap = cv2.VideoCapture('http://192.168.1.2:4747/video')
+
+dir_array=['f','f','f','f','f','f','f','f','f']
+time_array=[0,0,0,0,0,0,0,0,0]
+
+
+while True:
+    ret, image = cap.read()
+
+    # function of mask red " region  "
+
+    # function of mask blue " normal mask  "
+
+    # the output of each function is only an image of the result
+
+
+    region1 = image[0:100, 0:100]           # regions of the images
+    region2 = image[0:100, 540:640]
+    region3 = image[380:480, 0:100]
+    region4 = image[380:480, 540:640]
+
+    region5 = image[000:100, 100:540]
+    region6 = image[380:480, 100:540]
+    region7 = image[100:380, 000:100]
+    region8 = image[100:380, 540:640]
+
+    ratio1 = np.sum(region1) / region1.size      # ratio comes from calibration 
+    ratio2 = np.sum(region2) / region2.size
+    ratio3 = np.sum(region3) / region3.size      #ratio of the region which contain the color 
+    ratio4 = np.sum(region4) / region4.size
+
+    ratio5 = np.sum(region5) / region5.size
+    ratio6 = np.sum(region6) / region6.size
+    ratio7 = np.sum(region7) / region7.size
+    ratio8 = np.sum(region8) / region8.size
+
+
+
+
+    if region5 == 1 :           ## go up
+        ard.write(b'a')
+        x=time.time()
+        dir_array[0]='y'
+        count=count+1
+        while(region8 or region7) != #red:       ## loop till detect right or left
+            # will loop till
+
+        time_array[0]=time.time()-x
+
+
+
+    elif region6 == 1 :         ## go down
+        ard.write(b'b')
+        x=time.time()
+        dir_array[0]='m'
+        count=count+1
+
+        while(region7 or region8) !=1:         ## loop till detect right or left
+            # will loop till
+
+        time_array[0]=time.time()-x
+
+
+
+
+    elif region7 == 1 :         ## go left
+        ard.write(b'c')
+        x=time.time()
+        dir_array[0]='n'
+        count=count+1
+
+        while(region5 or region6) !=1:       ## loop till detect right or left
+                # will loop till
+
+        time_array[0]=time.time()-x
+
+
+
+    elif region8 == 1 :             ## go right
+        ard.write(b'd')
+        x=time.time()
+        dir_array[0]='x'
+        count=count+1
+
+        while(region7 or region8) !=1:           ## loop till detect right or left
+                # will loop till
+
+        time_array[0]=time.time()-x
+
+
+
+    cv2.imshow('real', image)
+
+    if cv2.waitKey(1) & 0xff == ord('q'):
+        break
+
+
+cap.release()
+cv2.destroyAllWindows()

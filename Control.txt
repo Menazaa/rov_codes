@@ -1,0 +1,898 @@
+
+class joy:
+  def __init__(self):
+        super(joy, self).__init__()
+  pygame.init()
+  done = False
+  pygame.joystick.init()
+  m=0
+  movement="STOP" #to indicate the direction of movement
+  speed=0 #range of speed
+  leds=gripper=liftbag=0
+
+  rep = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  def joystickfunc(self) -> object:
+     print('a')
+
+     if joy.done == False:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+            if event.type == pygame.JOYBUTTONUP:
+
+                joy.m=1
+
+        joystick_count = pygame.joystick.get_count()
+
+        joystick = pygame.joystick.Joystick(0)
+        joystick.init()
+
+        axis_x = joystick.get_axis(0)
+        axis_y = -joystick.get_axis(1)
+        axis_z = -joystick.get_axis(2)
+        axis_r = joystick.get_axis(3)
+
+        button1 = joystick.get_button(0)
+        button2 = joystick.get_button(1)
+        button3 = joystick.get_button(2)
+        button4 = joystick.get_button(3)
+        button5 = joystick.get_button(4)
+        button6 = joystick.get_button(5)
+        button7 = joystick.get_button(6)
+
+        button8  = joystick.get_button(7)
+        button9  = joystick.get_button(8)
+        button10 = joystick.get_button(9)
+        button11 = joystick.get_button(10)
+        button12 = joystick.get_button(11)
+        hat = joystick.get_hat(0)
+
+
+
+
+
+        if axis_x > .2 and axis_x <= .6:
+            if joy.rep[0]==0:
+                print('right first speed')
+                ard.write(b'g')
+                joy.movement="RIGHT"
+                joy.speed=0
+                joy.rep[0]=joy.rep[0]+1
+            joy.rep[1]=0
+            joy.rep[2]=0
+            joy.rep[3]=0
+            joy.rep[4]=0
+            joy.rep[5]=0
+
+            joy.rep[6]=0
+            joy.rep[7]=0
+            joy.rep[8]=0
+            joy.rep[9]=0
+            joy.rep[10]=0
+            joy.rep[11] = 0
+
+            joy.rep[12]=0
+            joy.rep[13]=0
+            joy.rep[14]=0
+            joy.rep[15]=0
+            joy.rep[16]=0
+            joy.rep[17]=0
+
+            joy.rep[18]=0
+            joy.rep[19]=0
+            joy.rep[20]=0
+            joy.rep[21]=0
+            joy.rep[22]=0
+
+        elif axis_x > .6 and axis_x <= .9:
+            if joy.rep[1]==0:
+                print('right second speed')
+                ard.write(b'h')
+                joy.movement="RIGHT"
+                joy.speed=50
+                joy.rep[1]=joy.rep[1]+1
+            joy.rep[0]=0
+            joy.rep[2]=0
+            joy.rep[3]=0
+            joy.rep[4]=0
+            joy.rep[5]=0
+
+            joy.rep[6]=0
+            joy.rep[7]=0
+            joy.rep[8]=0
+            joy.rep[9]=0
+            joy.rep[10]=0
+            joy.rep[11]=0
+
+            joy.rep[12]=0
+            joy.rep[13]=0
+            joy.rep[14]=0
+            joy.rep[15]=0
+            joy.rep[16]=0
+            joy.rep[17]=0
+
+            joy.rep[18]=0
+            joy.rep[19]=0
+            joy.rep[20]=0
+            joy.rep[21]=0
+            joy.rep[22]=0
+
+        elif axis_x > .9:
+            if joy.rep[2] == 0:
+                print('right third speed')
+                ard.write(b'i')
+                joy.movement = "RIGHT"
+                joy.speed = 100
+                joy.rep[2] = joy.rep[2] + 1
+            joy.rep[1] = 0
+            joy.rep[0] = 0
+            joy.rep[3] = 0
+            joy.rep[4] = 0
+            joy.rep[5] = 0
+
+            joy.rep[6]=0
+            joy.rep[7]=0
+            joy.rep[8]=0
+            joy.rep[9]=0
+            joy.rep[10]=0
+            joy.rep[11] = 0
+
+            joy.rep[12]=0
+            joy.rep[13]=0
+            joy.rep[14]=0
+            joy.rep[15]=0
+            joy.rep[16]=0
+            joy.rep[17]=0
+
+            joy.rep[18]=0
+            joy.rep[19]=0
+            joy.rep[20]=0
+            joy.rep[21]=0
+            joy.rep[22]=0
+
+        elif axis_x < -.3 and axis_x >= -.6:
+            if joy.rep[3]==0:
+                print('left first speed j')
+                joy.movement = "LEFT"
+                joy.speed = 0
+                ard.write(b'j')
+                joy.rep[3]=joy.rep[3]+1
+            joy.rep[1]=0
+            joy.rep[2]=0
+            joy.rep[0]=0
+            joy.rep[4]=0
+            joy.rep[5]=0
+
+            joy.rep[6]=0
+            joy.rep[7]=0
+            joy.rep[8]=0
+            joy.rep[9]=0
+            joy.rep[10]=0
+            joy.rep[11]=0
+
+            joy.rep[12]=0
+            joy.rep[13]=0
+            joy.rep[14]=0
+            joy.rep[15]=0
+            joy.rep[16]=0
+            joy.rep[17]=0
+
+            joy.rep[18]=0
+            joy.rep[19]=0
+            joy.rep[20]=0
+            joy.rep[21]=0
+            joy.rep[22]=0
+
+        elif axis_x < -.6 and axis_x >= -.9:
+            if joy.rep[4]==0:
+                print('left second speed k')
+                joy.movement = "LEFT"
+                joy.speed = 50
+                ard.write(b'k')
+                joy.rep[4]=joy.rep[4]+1
+            joy.rep[1]=0
+            joy.rep[2]=0
+            joy.rep[3]=0
+            joy.rep[0]=0
+            joy.rep[5]=0
+
+            joy.rep[6]=0
+            joy.rep[7]=0
+            joy.rep[8]=0
+            joy.rep[9]=0
+            joy.rep[10]=0
+            joy.rep[11]=0
+
+            joy.rep[12]=0
+            joy.rep[13]=0
+            joy.rep[14]=0
+            joy.rep[15]=0
+            joy.rep[16]=0
+            joy.rep[17]=0
+
+            joy.rep[18]=0
+            joy.rep[19]=0
+            joy.rep[20]=0
+            joy.rep[21]=0
+            joy.rep[22]=0
+
+        elif axis_x < -.9:
+            if joy.rep[5]==0:
+                print('left third speed l')
+                joy.movement = "LEFT"
+                joy.speed = 100
+                ard.write(b'l')
+                joy.rep[5]=joy.rep[5]+1
+            joy.rep[1]=0
+            joy.rep[2]=0
+            joy.rep[3]=0
+            joy.rep[4]=0
+            joy.rep[0]=0
+
+            joy.rep[6]=0
+            joy.rep[7]=0
+            joy.rep[8]=0
+            joy.rep[9]=0
+            joy.rep[10]=0
+            joy.rep[11]=0
+
+            joy.rep[12]=0
+            joy.rep[13]=0
+            joy.rep[14]=0
+            joy.rep[15]=0
+            joy.rep[16]=0
+            joy.rep[17]=0
+
+            joy.rep[18]=0
+            joy.rep[19]=0
+            joy.rep[20]=0
+            joy.rep[21]=0
+            joy.rep[22]=0
+
+
+
+        elif axis_y > .2 and axis_y <= .6:
+            if joy.rep[6] == 0:
+                print('forward first speed a')
+                joy.movement = "FORWARD"
+                joy.speed = 0
+                ard.write(b'a')
+                joy.rep[6] = joy.rep[6] + 1
+            joy.rep[1] = 0
+            joy.rep[2] = 0
+            joy.rep[3] = 0
+            joy.rep[4] = 0
+            joy.rep[5] = 0
+
+            joy.rep[0] = 0
+            joy.rep[7] = 0
+            joy.rep[8] = 0
+            joy.rep[9] = 0
+            joy.rep[10] = 0
+            joy.rep[11] = 0
+
+            joy.rep[12]=0
+            joy.rep[13]=0
+            joy.rep[14]=0
+            joy.rep[15]=0
+            joy.rep[16]=0
+            joy.rep[17]=0
+
+            joy.rep[18]=0
+            joy.rep[19]=0
+            joy.rep[20]=0
+            joy.rep[21]=0
+            joy.rep[22]=0
+
+
+        elif axis_y > .6 and axis_y <= .9:
+            if joy.rep[7] == 0:
+                print('forward second speed b')
+                joy.movement = "FORWARD"
+                joy.speed = 50
+                ard.write(b'b')
+                joy.rep[7] = joy.rep[7] + 1
+            joy.rep[1] = 0
+            joy.rep[2] = 0
+            joy.rep[3] = 0
+            joy.rep[4] = 0
+            joy.rep[5] = 0
+
+            joy.rep[6] = 0
+            joy.rep[0] = 0
+            joy.rep[8] = 0
+            joy.rep[9] = 0
+            joy.rep[10] = 0
+            joy.rep[11] = 0
+
+            joy.rep[12]=0
+            joy.rep[13]=0
+            joy.rep[14]=0
+            joy.rep[15]=0
+            joy.rep[16]=0
+            joy.rep[17]=0
+
+            joy.rep[18]=0
+            joy.rep[19]=0
+            joy.rep[20]=0
+            joy.rep[21]=0
+            joy.rep[22]=0
+
+        elif axis_y > .9:
+            if joy.rep[8] == 0:
+                print('forward third speed c')
+                joy.movement = "FORWARD"
+                joy.speed = 100
+                ard.write(b'c')
+                joy.rep[8] = joy.rep[8] + 1
+            joy.rep[1] = 0
+            joy.rep[2] = 0
+            joy.rep[3] = 0
+            joy.rep[4] = 0
+            joy.rep[5] = 0
+
+            joy.rep[6] = 0
+            joy.rep[7] = 0
+            joy.rep[0] = 0
+            joy.rep[9] = 0
+            joy.rep[10] = 0
+            joy.rep[11] = 0
+
+            joy.rep[12]=0
+            joy.rep[13]=0
+            joy.rep[14]=0
+            joy.rep[15]=0
+            joy.rep[16]=0
+            joy.rep[17]=0
+
+            joy.rep[18]=0
+            joy.rep[19]=0
+            joy.rep[20]=0
+            joy.rep[21]=0
+            joy.rep[22]=0
+
+        elif axis_y < -.2 and axis_y >= -.6:
+            if joy.rep[9] == 0:
+                print('backword first speed d')
+                joy.movement = "BACK"
+                joy.speed = 0
+                ard.write(b'd')
+                joy.rep[9] = joy.rep[9] + 1
+            joy.rep[1] = 0
+            joy.rep[2] = 0
+            joy.rep[3] = 0
+            joy.rep[4] = 0
+            joy.rep[5] = 0
+
+            joy.rep[6] = 0
+            joy.rep[7] = 0
+            joy.rep[8] = 0
+            joy.rep[0] = 0
+            joy.rep[10] = 0
+            joy.rep[11] = 0
+
+            joy.rep[12]=0
+            joy.rep[13]=0
+            joy.rep[14]=0
+            joy.rep[15]=0
+            joy.rep[16]=0
+            joy.rep[17]=0
+
+            joy.rep[18]=0
+            joy.rep[19]=0
+            joy.rep[20]=0
+            joy.rep[21]=0
+            joy.rep[22]=0
+
+        elif axis_y < -.6 and axis_y >= -.9:
+            if joy.rep[10] == 0:
+                print('backword second speed e')
+                joy.movement = "BACK"
+                joy.speed = 50
+                ard.write(b'e')
+                joy.rep[10] = joy.rep[10] + 1
+            joy.rep[1] = 0
+            joy.rep[2] = 0
+            joy.rep[3] = 0
+            joy.rep[4] = 0
+            joy.rep[5] = 0
+
+            joy.rep[6] = 0
+            joy.rep[7] = 0
+            joy.rep[8] = 0
+            joy.rep[9] = 0
+            joy.rep[0] = 0
+            joy.rep[11] = 0
+
+            joy.rep[12]=0
+            joy.rep[13]=0
+            joy.rep[14]=0
+            joy.rep[15]=0
+            joy.rep[16]=0
+            joy.rep[17]=0
+
+            joy.rep[18]=0
+            joy.rep[19]=0
+            joy.rep[20]=0
+            joy.rep[21]=0
+            joy.rep[22]=0
+
+        elif axis_y < -.9:
+            if joy.rep[11] == 0:
+                print('backword third speed f')
+                joy.movement = "BACK"
+                joy.speed = 100
+                ard.write(b'f')
+                joy.rep[11] = joy.rep[11] + 1
+            joy.rep[1] = 0
+            joy.rep[2] = 0
+            joy.rep[3] = 0
+            joy.rep[4] = 0
+            joy.rep[5] = 0
+
+            joy.rep[6] = 0
+            joy.rep[7] = 0
+            joy.rep[8] = 0
+            joy.rep[9] = 0
+            joy.rep[10] = 0
+            joy.rep[0] = 0
+
+            joy.rep[12]=0
+            joy.rep[13]=0
+            joy.rep[14]=0
+            joy.rep[15]=0
+            joy.rep[16]=0
+            joy.rep[17]=0
+
+            joy.rep[18]=0
+            joy.rep[19]=0
+            joy.rep[20]=0
+            joy.rep[21]=0
+            joy.rep[22]=0
+
+        elif axis_z > .3 and axis_z <= .6:
+            if joy.rep[12] == 0:
+                print('up first speed m')
+                joy.movement = "UP"
+                joy.speed = 0
+                ard.write(b'm')
+                joy.rep[12] = joy.rep[12] + 1
+            joy.rep[1] = 0
+            joy.rep[2] = 0
+            joy.rep[3] = 0
+            joy.rep[4] = 0
+            joy.rep[5] = 0
+
+            joy.rep[6] = 0
+            joy.rep[7] = 0
+            joy.rep[8] = 0
+            joy.rep[9] = 0
+            joy.rep[10] = 0
+            joy.rep[11] = 0
+
+            joy.rep[0] = 0
+            joy.rep[13] = 0
+            joy.rep[14] = 0
+            joy.rep[15] = 0
+            joy.rep[16] = 0
+            joy.rep[17] = 0
+
+            joy.rep[18]=0
+            joy.rep[19]=0
+            joy.rep[20]=0
+            joy.rep[21]=0
+            joy.rep[22]=0
+
+        elif axis_z > .6 and axis_z <= .9:
+            if joy.rep[13] == 0:
+                print('up second speed n')
+                joy.movement = "UP"
+                joy.speed = 50
+                ard.write(b'n')
+                joy.rep[13] = joy.rep[13] + 1
+            joy.rep[1] = 0
+            joy.rep[2] = 0
+            joy.rep[3] = 0
+            joy.rep[4] = 0
+            joy.rep[5] = 0
+
+            joy.rep[6] = 0
+            joy.rep[7] = 0
+            joy.rep[8] = 0
+            joy.rep[9] = 0
+            joy.rep[10] = 0
+            joy.rep[11] = 0
+
+            joy.rep[12] = 0
+            joy.rep[0] = 0
+            joy.rep[14] = 0
+            joy.rep[15] = 0
+            joy.rep[16] = 0
+            joy.rep[17] = 0
+
+            joy.rep[18]=0
+            joy.rep[19]=0
+            joy.rep[20]=0
+            joy.rep[21]=0
+            joy.rep[22]=0
+
+        elif axis_z > .9:
+            if joy.rep[14] == 0:
+                print('up third first speed /')
+                joy.movement = "UP"
+                joy.speed = 100
+                ard.write(b'/')
+                joy.rep[14] = joy.rep[14] + 1
+            joy.rep[1] = 0
+            joy.rep[2] = 0
+            joy.rep[3] = 0
+            joy.rep[4] = 0
+            joy.rep[5] = 0
+
+            joy.rep[6] = 0
+            joy.rep[7] = 0
+            joy.rep[8] = 0
+            joy.rep[9] = 0
+            joy.rep[10] = 0
+            joy.rep[11] = 0
+
+            joy.rep[12] = 0
+            joy.rep[13] = 0
+            joy.rep[0] = 0
+            joy.rep[15] = 0
+            joy.rep[16] = 0
+            joy.rep[17] = 0
+
+            joy.rep[18]=0
+            joy.rep[19]=0
+            joy.rep[20]=0
+            joy.rep[21]=0
+            joy.rep[22]=0
+
+        elif axis_z < -.3 and axis_z >= -.6:
+            if joy.rep[15] == 0:
+                print('down first speed p')
+                joy.movement = "DOWN"
+                joy.speed = 0
+                ard.write(b'p')
+                joy.rep[15] = joy.rep[15] + 1
+            joy.rep[1] = 0
+            joy.rep[2] = 0
+            joy.rep[3] = 0
+            joy.rep[4] = 0
+            joy.rep[5] = 0
+
+            joy.rep[6] = 0
+            joy.rep[7] = 0
+            joy.rep[8] = 0
+            joy.rep[9] = 0
+            joy.rep[10] = 0
+            joy.rep[11] = 0
+
+            joy.rep[12] = 0
+            joy.rep[13] = 0
+            joy.rep[14] = 0
+            joy.rep[0] = 0
+            joy.rep[16] = 0
+            joy.rep[17] = 0
+
+            joy.rep[18]=0
+            joy.rep[19]=0
+            joy.rep[20]=0
+            joy.rep[21]=0
+            joy.rep[22]=0
+
+        elif axis_z < -.6 and axis_z >= -.9:
+            if joy.rep[16] == 0:
+                print('down second speed q')
+                joy.movement = "DOWN"
+                joy.speed = 50
+                ard.write(b'q')
+                joy.rep[16] = joy.rep[16] + 1
+            joy.rep[1] = 0
+            joy.rep[2] = 0
+            joy.rep[3] = 0
+            joy.rep[4] = 0
+            joy.rep[5] = 0
+
+            joy.rep[6] = 0
+            joy.rep[7] = 0
+            joy.rep[8] = 0
+            joy.rep[9] = 0
+            joy.rep[10] = 0
+            joy.rep[11] = 0
+
+            joy.rep[12] = 0
+            joy.rep[13] = 0
+            joy.rep[14] = 0
+            joy.rep[15] = 0
+            joy.rep[0] = 0
+            joy.rep[17] = 0
+
+            joy.rep[18]=0
+            joy.rep[19]=0
+            joy.rep[20]=0
+            joy.rep[21]=0
+            joy.rep[22]=0
+
+        elif axis_z < -.9:
+            if joy.rep[17] == 0:
+                print('down third speed .')
+                joy.movement = "DOWN"
+                joy.speed = 100
+                ard.write(b'.')
+                joy.rep[17] = joy.rep[17] + 1
+            joy.rep[1] = 0
+            joy.rep[2] = 0
+            joy.rep[3] = 0
+            joy.rep[4] = 0
+            joy.rep[5] = 0
+
+            joy.rep[6] = 0
+            joy.rep[7] = 0
+            joy.rep[8] = 0
+            joy.rep[9] = 0
+            joy.rep[10] = 0
+            joy.rep[11] = 0
+
+            joy.rep[12] = 0
+            joy.rep[13] = 0
+            joy.rep[14] = 0
+            joy.rep[15] = 0
+            joy.rep[16] = 0
+            joy.rep[0] = 0
+
+            joy.rep[18]=0
+            joy.rep[19]=0
+            joy.rep[20]=0
+            joy.rep[21]=0
+            joy.rep[22]=0
+
+
+        elif axis_r > .2 and axis_r <= .9:
+            if joy.rep[18] == 0:
+                print('clockwise first speed t')
+                joy.movement = "R.CLOCK"
+                joy.speed = 0
+                ard.write(b't')
+                joy.rep[18] = joy.rep[18] + 1
+            joy.rep[1] = 0
+            joy.rep[2] = 0
+            joy.rep[3] = 0
+            joy.rep[4] = 0
+            joy.rep[5] = 0
+
+            joy.rep[6] = 0
+            joy.rep[7] = 0
+            joy.rep[8] = 0
+            joy.rep[9] = 0
+            joy.rep[10] = 0
+            joy.rep[11] = 0
+
+            joy.rep[12] = 0
+            joy.rep[13] = 0
+            joy.rep[14] = 0
+            joy.rep[15] = 0
+            joy.rep[16] = 0
+            joy.rep[17] = 0
+
+            joy.rep[0] = 0
+            joy.rep[19] = 0
+            joy.rep[20] = 0
+            joy.rep[21] = 0
+            joy.rep[22] = 0
+
+        elif axis_r > .9:
+            if joy.rep[19] == 0:
+                print('clockwise second speed u')
+                joy.movement = "R.CLOCK"
+                joy.speed = 50
+                ard.write(b'u')
+                joy.rep[19] = joy.rep[19] + 1
+            joy.rep[1] = 0
+            joy.rep[2] = 0
+            joy.rep[3] = 0
+            joy.rep[4] = 0
+            joy.rep[5] = 0
+
+            joy.rep[6] = 0
+            joy.rep[7] = 0
+            joy.rep[8] = 0
+            joy.rep[9] = 0
+            joy.rep[10] = 0
+            joy.rep[11] = 0
+
+            joy.rep[12] = 0
+            joy.rep[13] = 0
+            joy.rep[14] = 0
+            joy.rep[15] = 0
+            joy.rep[16] = 0
+            joy.rep[17] = 0
+
+            joy.rep[18] = 0
+            joy.rep[0] = 0
+            joy.rep[20] = 0
+            joy.rep[21] = 0
+            joy.rep[22] = 0
+
+        elif axis_r < -.4 and axis_r >= -.9:
+            if joy.rep[20] == 0:
+                print('anticlockwise first speed r')
+                joy.movement = "R.ANTI"
+                joy.speed = 0
+                ard.write(b'r')
+                joy.rep[20] = joy.rep[20] + 1
+            joy.rep[1] = 0
+            joy.rep[2] = 0
+            joy.rep[3] = 0
+            joy.rep[4] = 0
+            joy.rep[5] = 0
+
+            joy.rep[6] = 0
+            joy.rep[7] = 0
+            joy.rep[8] = 0
+            joy.rep[9] = 0
+            joy.rep[10] = 0
+            joy.rep[11] = 0
+
+            joy.rep[12] = 0
+            joy.rep[13] = 0
+            joy.rep[14] = 0
+            joy.rep[15] = 0
+            joy.rep[16] = 0
+            joy.rep[17] = 0
+
+            joy.rep[18] = 0
+            joy.rep[19] = 0
+            joy.rep[0] = 0
+            joy.rep[21] = 0
+            joy.rep[22] = 0
+
+        elif axis_r < -.9:
+            if joy.rep[21] == 0:
+                print('anticlockwise second speed s')
+                joy.movement = "R.ANTI"
+                joy.speed = 50
+                ard.write(b's')
+                joy.rep[21] = joy.rep[21] + 1
+            joy.rep[1] = 0
+            joy.rep[2] = 0
+            joy.rep[3] = 0
+            joy.rep[4] = 0
+            joy.rep[5] = 0
+
+            joy.rep[6] = 0
+            joy.rep[7] = 0
+            joy.rep[8] = 0
+            joy.rep[9] = 0
+            joy.rep[10] = 0
+            joy.rep[11] = 0
+
+            joy.rep[12] = 0
+            joy.rep[13] = 0
+            joy.rep[14] = 0
+            joy.rep[15] = 0
+            joy.rep[16] = 0
+            joy.rep[17] = 0
+
+            joy.rep[18] = 0
+            joy.rep[19] = 0
+            joy.rep[20] = 0
+            joy.rep[0] = 0
+            joy.rep[22] = 0
+
+        else:
+            if joy.rep[22] == 0:
+                print('STOPPED o')
+                joy.movement = "STOP"
+                joy.speed = 0
+                ard.write(b'o')
+                joy.rep[22] = joy.rep[22] + 1
+            joy.rep[1] = 0
+            joy.rep[2] = 0
+            joy.rep[3] = 0
+            joy.rep[4] = 0
+            joy.rep[5] = 0
+
+            joy.rep[6] = 0
+            joy.rep[7] = 0
+            joy.rep[8] = 0
+            joy.rep[9] = 0
+            joy.rep[10] = 0
+            joy.rep[11] = 0
+
+            joy.rep[12] = 0
+            joy.rep[13] = 0
+            joy.rep[14] = 0
+            joy.rep[15] = 0
+            joy.rep[16] = 0
+            joy.rep[17] = 0
+
+            joy.rep[18] = 0
+            joy.rep[19] = 0
+            joy.rep[20] = 0
+            joy.rep[21] = 0
+            joy.rep[0] = 0
+
+
+
+
+
+        if ( joy.m >.5 and button1 ):
+            print(" gripper ", flush=True)
+            joy.m=0
+            joy.gripper=1
+            ard.write(b'B')
+
+        if ( joy.m >.5 and button2 ):
+            joy.m=0
+            print('o')
+            ard.write(b'o')
+
+
+        if ( joy.m >.5 and button3 ):
+            print(" but3 ", flush=True)
+            joy.m=0
+
+
+
+        if ( joy.m >.5 and button4 ):
+            print(" D ", flush=True)
+            joy.m=0
+            ard.write(b'D')
+
+
+
+        if ( joy.m >.5 and button5 ):
+            print(" A ", flush=True)
+            joy.leds!=joy.leds
+            #m=0
+            ard.write(b'A')
+
+
+        if (joy.m > .5 and button6):
+            print(" c ", flush=True)
+            joy.m = 0
+            joy.liftbag!=joy.liftbag
+            ard.write(b'C')
+
+        if (joy.m > .5 and button7):
+            print(" but7 ", flush=True)
+            joy.m = 0
+            status[10] = 'a'
+
+        if (joy.m> .5 and button8):
+            print(" but8 ", flush=True)
+            joy.m = 0
+            status[11] = 'a'
+        else:
+            status[11] = 'b'
+
+        if (joy.m > .5 and button9):
+            print(" but9 ", flush=True)
+            joy.m = 0
+            status[12] = 'a'
+        else:
+            status[12] = 'b'
+
+        if (joy.m > .5 and button10):
+            print(" but10 ", flush=True)
+            joy.m = 0
+            status[13] = 'a'
+        else:
+            status[13] = 'b'
+
+        if (joy.m > .5 and button11):
+            print(" but11 ", flush=True)
+            joy.m = 0
+            status[14] = 'a'
+        else:
+            status[14] = 'b'
+
+        if (joy.m > .5 and button12):
+            print(" but12 ", flush=True)
+            joy.m = 0
+            status[15] = 'a'
+        else:
+            status[15] = 'b'                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            

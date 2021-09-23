@@ -1,0 +1,69 @@
+import numpy as np
+import cv2
+
+FILE = open("C:\\Users\\TELE\\Desktop\\mission\\trial_one.txt","w+")
+
+image = cv2.imread('E:\\vortex\\cv2\\the_blue2.png')
+# image = image[100:500, 50:400]
+blur = cv2.bilateralFilter(image, 30, 75, 75)
+gray = cv2.cvtColor(blur, cv2.COLOR_RGB2GRAY)
+upper_left = gray[0:100, 0:100]
+lower_left = gray[200:300, 0:100]
+upper_right = gray[0:100, 200:300]
+lower_right = gray[200:300, 200:300]
+gray1 = cv2.cvtColor(blur, cv2.COLOR_RGB2GRAY)
+
+
+image = cv2.bilateralFilter(image, 1, 5, 20)
+hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+lr = np.array([0, 0, 0])
+hr = np.array([180, 255, 150])
+mask = cv2.inRange(hsv, lr, hr)
+image = cv2.bitwise_and(image, image, mask=mask)
+
+region5 = image[000:100, 100:540]
+region6 = image[380:480, 100:540]
+region7 = image[100:380, 000:100]
+region8 = image[100:380, 540:640]
+
+ratio5 = np.sum(region5) / region5.size
+ratio6 = np.sum(region6) / (region6.size+.001)
+ratio7 = np.sum(region7) / region7.size
+ratio8 = np.sum(region8) / (region8.size+.001)
+
+print("  up  =  ", ratio5)
+print(" dwon   =  ", ratio6)
+print(" left  =  ", ratio7)
+print(" right  =  ", ratio8)
+
+gray1[0:100, 0:100] = 125
+gray1[200:300, 0:100]= 125
+gray1[0:100, 200:300]= 125
+gray1[200:300, 200:300]= 125
+
+upper_left_avg = np.sum(upper_left) / upper_left.size
+lower_left_avg = np.sum(lower_left) / lower_left.size
+upper_right_avg = np.sum(upper_right) / upper_right.size
+lower_right_avg = np.sum(lower_right) / lower_right.size
+
+print(" upper left coef   =  ", int(upper_left_avg))
+print(" lower left coef   =  ", int(lower_left_avg))
+print(" upper right coef  =  ", int(upper_right_avg))
+print(" lower right coef  =  ", int(lower_right_avg))
+
+FILE.write(" upper left coef   =  %d\n" % int(upper_left_avg))
+FILE.write(" lower left coef   =  %d\n" % int(lower_left_avg))
+FILE.write(" upper right coef  =  %d\n" % int(upper_right_avg))
+FILE.write(" lower right coef  =  %d\n" % int(lower_right_avg))
+
+FILE.write("############################################# \n\n")
+
+print("#############################################")
+
+cv2.imshow('image', gray)
+cv2.imshow('image2', gray1)
+
+cv2.imshow('image3', image)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()

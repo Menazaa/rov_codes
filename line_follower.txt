@@ -1,0 +1,190 @@
+import cv2
+import numpy as np
+# import serial
+import time
+
+# ard = serial.Serial('COM6', 9600)  #creating pbject andindentifing the com of arduino and baud rate
+cap = cv2.VideoCapture(0)
+
+k = 1
+# ard.write(b'x')
+
+while True:
+    ret, image = cap.read()
+    image = image[100:400, 100:400]
+    blur = cv2.bilateralFilter(image, 30, 75, 75)
+    hsv = cv2.cvtColor(blur, cv2.COLOR_BGR2HSV)
+
+    lr = np.array([0, 100, 50])
+    hr = np.array([10, 255, 255])
+
+    lower_blue = np.array([100, 150, 0])  # the range of lower blue in hsv
+    higher_blue = np.array([130, 255, 255])
+
+    mask = cv2.inRange(hsv, lr, hr)
+    mask_blue = cv2.inRange(hsv, lower_blue, higher_blue)
+    _, cont = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    image2 = image
+
+    image[95:105, 95:105] = 255
+    image[95:105, 195:205] = 255
+    image[195:205, 95:105] = 255
+    image[195:205, 195:205] = 255
+
+    image[200:300, 0:100] = 255
+    image[0:100, 0:100] = 255
+    image[0:100, 200:300] = 255
+    image[200:300, 200:300] = 255
+
+    ##############
+    image[0:100, 100:200] = (110, 50, 50)
+    image[100:200, 0:100] = (110, 50, 50)
+    image[100:200, 200:300] = (110, 50, 50)
+    image[200:300, 100:200] = (110, 50, 50)
+    ##############
+    UP = mask[0:100, 100:200]
+    LEFT = mask[100:200, 0:100]
+    RIGHT = mask[100:200, 200:300]
+    LOW = mask[200:300, 100:200]
+
+    ul = mask[0:100, 0:100]  # upper left
+    ur = mask[0:100, 200:300]  # upper right
+
+    lf = mask[200:300, 0:100]  #
+    lr = mask[200:300, 200:300]  #
+
+    ##start the initial
+    ################################################
+
+    if (np.any(UP == 255) and np.any(LOW != 255) and k == 1):
+        print ("first condition")
+        # ard.write(b'a')      ##go up and delay till you find right or left turn
+        k = -1
+        ##time.sleep(1)
+        while (1):
+            #   ard.write(b'a')      ##go up and delay till you find right or left turn
+            ret, image = cap.read()
+            image = image[100:400, 100:400]
+            blur = cv2.bilateralFilter(image, 30, 75, 75)
+            hsv = cv2.cvtColor(blur, cv2.COLOR_BGR2HSV)
+            lr = np.array([0, 0, 50])
+            hr = np.array([10, 255, 255])
+            mask = cv2.inRange(hsv, lr, hr)
+
+            UP = mask[0:100, 100:200]
+            LEFT = mask[100:200, 0:100]
+            RIGHT = mask[100:200, 200:300]
+            LOW = mask[200:300, 100:200]
+
+            print("on while one")
+            cv2.imshow('image', image)
+            cv2.imshow('mask', mask)
+
+            if (cv2.waitKey(1) & 0xff == ord('q')) or ((np.any(RIGHT == 255) or np.any(LEFT == 255))):
+                # ard.write(b's')
+                break
+                ######################################
+
+                ######################################
+
+    elif (np.any(LOW == 255) and np.any(UP != 255) and k == 1):
+        print ("second condition")
+        # ard.write(b'b')      ##go up and delay till you find right or left turn
+        ##time.sleep(1)
+
+        while (1):
+            ret, image = cap.read()
+            image = image[100:400, 100:400]
+            blur = cv2.bilateralFilter(image, 30, 75, 75)
+            hsv = cv2.cvtColor(blur, cv2.COLOR_BGR2HSV)
+            lr = np.array([0, 50, 50])
+            hr = np.array([10, 255, 255])
+            mask = cv2.inRange(hsv, lr, hr)
+
+            UP = mask[0:100, 100:200]
+            LEFT = mask[100:200, 0:100]
+            RIGHT = mask[100:200, 200:300]
+            LOW = mask[200:300, 100:200]
+
+            print("on while two")
+            cv2.imshow('image', image)
+            cv2.imshow('mask', mask)
+
+            if (cv2.waitKey(1) & 0xff == ord('q')) or ((np.any(RIGHT == 255) or np.any(LEFT == 255))):
+                # ard.write(b's')
+                break
+                ###########################################
+
+                ###########################################
+
+    elif (np.any(RIGHT == 255) and np.any(LEFT != 255) and k == -1):
+        print ("third condition")
+        # ard.write(b'c')      ##go up and delay till you find right or left turnq
+        ##time.sleep(1)
+        k = 1
+        while (1):
+            ret, image = cap.read()
+            image = image[100:400, 100:400]
+            blur = cv2.bilateralFilter(image, 30, 75, 75)
+            hsv = cv2.cvtColor(blur, cv2.COLOR_BGR2HSV)
+            lr = np.array([0, 50, 50])
+            hr = np.array([10, 255, 255])
+            mask = cv2.inRange(hsv, lr, hr)
+
+            UP = mask[0:100, 100:200]
+            LEFT = mask[100:200, 0:100]
+            RIGHT = mask[100:200, 200:300]
+            LOW = mask[200:300, 100:200]
+
+            print("on while three")
+            cv2.imshow('image', image)
+            cv2.imshow('mask', mask)
+
+            if (cv2.waitKey(1) & 0xff == ord('q')) or ((np.any(UP == 255) or np.any(LOW == 255))):
+                # ard.write(b's')
+                break
+                ######################################
+
+                ######################################
+
+    elif (np.any(LEFT == 255) and np.any(RIGHT != 255)):
+        print ("fourth condition")
+        # ard.write(b'd')      ##go up and delay till you find right or left turnq
+        # time.sleep(1)
+
+        while (1):
+            ret, image = cap.read()
+            image = image[100:400, 100:400]
+            blur = cv2.bilateralFilter(image, 30, 75, 75)
+            hsv = cv2.cvtColor(blur, cv2.COLOR_BGR2HSV)
+            lr = np.array([0, 50, 50])
+            hr = np.array([10, 255, 255])
+            mask = cv2.inRange(hsv, lr, hr)
+
+            UP = mask[0:100, 100:200]
+            LEFT = mask[100:200, 0:100]
+            RIGHT = mask[100:200, 200:300]
+            LOW = mask[200:300, 100:200]
+
+            print("on while four")
+            cv2.imshow('image', image)
+            cv2.imshow('mask', mask)
+
+            if (cv2.waitKey(1) & 0xff == ord('q')) or ((np.any(UP == 255) or np.any(LOW == 255))):
+                # ard.write(b's')
+                break
+                ###################################
+
+    cv2.imshow('image', image)
+    cv2.imshow('mask', mask)
+
+
+    if cv2.waitKey(1) & 0xff == ord('q'):
+        break
+
+# ard.close()
+cap.release()
+cv2.destroyAllWindows()
+
+

@@ -1,0 +1,681 @@
+
+import numpy as np
+import math
+import cv2 as cv
+
+# the truth length of the reference
+tl = float(input('please enter TL'))
+##########################
+def nothing(x):
+    pass
+
+def all_mask (frame,l,h,blur_value,min_thresh):
+    kernel = np.ones((7,7),np.uint8)
+    if blur_value%2 ==0:
+        frame = cv.medianBlur(frame,blur_value+1)
+    else:
+        frame = cv.medianBlur(frame,blur_value)
+    
+    hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
+    mask = cv.inRange(hsv,l,h)
+    ret,mask = cv.threshold(mask , min_thresh,255,cv.THRESH_BINARY + cv.THRESH_OTSU)
+    res = cv.bitwise_and(frame,frame, mask= mask)
+    return res,mask
+
+
+
+######################
+
+# function to round up the output
+def round_up(n, decimals=0):
+    multiplier = 10 ** decimals
+    return math.ceil(n * multiplier) / multiplier
+
+
+# define function to calculate distance
+def distance(point1, point2):
+    x = point1[0] - point2[0]
+    x2 = x ** 2
+    y = point1[1] - point2[1]
+    y2 = y ** 2
+    return ((x2) + (y2)) ** 0.5
+
+
+# this function use Matrices in this link https://www.qc.edu.hk/math/Advanced%20Level/circle%20given%203%20points.htm
+# to get our circle equation to calculate cannon's area
+def circle_eq(p1, p2, p3):
+    
+    p_list = [p1, p2, p3]
+    a1 = [];
+    a2 = [];
+    a3 = [];
+    a4 = []
+    for i in p_list:
+        a1.append([i[0], i[1], 1])
+        a2.append([(i[0] ** 2 + i[1] ** 2), i[1], 1])
+        a3.append([(i[0] ** 2 + i[1] ** 2), i[0], 1])
+        a4.append([(i[0] ** 2 + i[1] ** 2), i[0], i[1]])
+    ad = np.linalg.det(a1)
+    el1 = -(np.linalg.det(a2) / ad)
+    el2 = np.linalg.det(a3) / ad
+    el3 = -(np.linalg.det(a4) / ad)
+    # circle equation
+    # x**2+y**2+el1*x+el2*y+el3 =0
+    return [el1, el2, el3]
+
+
+# define function to get the vectors
+def get_vector(point1, point2):
+    return (point2[0] - point1[0], point2[1] - point1[1])
+
+
+# get the mid point
+
+def get_mid(point1, point2):
+    mid = ((point1[0] + point2[0]) / 2, (point1[1] + point2[1]) / 2)
+    return mid
+
+
+# this function get rectangle area by vectors' multiplication
+def vectors_multiplication(v1=(0, 0), v2=(0, 0)):
+    return abs(v1[0] * v2[1] - v1[1] * v2[0])
+
+
+def roi(event, x, y, flags, param):
+    global top_points, transform_flag, roi_d
+    if event == cv.EVENT_LBUTTONUP:
+        if top_points[0] == (0, 0):
+            top_points[0] = (x, y)
+
+        elif top_points[1] == (0, 0):
+            top_points[1] = (x, y)
+
+        elif top_points[2] == (0, 0):
+            top_points[2] = (x, y)
+
+        elif top_points[3] == (0, 0):
+            top_points[3] = (x, y)
+            roi_d = True
+        else:
+            top_points = [(0, 0), (0, 0), (0, 0), (0, 0)]
+        # function to draw on the frame
+
+
+def draw_lines(event, x, y, flags, param):
+    global pv1, pv2, pv3, pv4, pt1, pt2, pt3, pt4, vRflag, vLflag, rflag, lflag,first_line_flag,second_line_flag,reference_flag
+
+    # this event for reference definition
+    if reference_flag:
+        if event == cv.EVENT_LBUTTONDOWN:
+            if not vRflag:
+                if pv1 == (0, 0):
+                    pv1 = x, y
+                elif pv2 == (0, 0):
+                    pv2 = x, y
+                    vRflag = True
+            elif not vLflag:
+                if pv3 == (0, 0):
+                    pv3 = x, y
+                elif pv4 == (0, 0):
+                    pv4 = x, y
+                    vLflag = True
+            elif vLflag and vRflag:
+                pv1 = (0, 0);
+                pv2 = (0, 0);
+                pv3 = (0, 0);
+                pv4 = (0, 0)
+                vRflag = False
+                vLflag = False
+
+
+
+    # this event for length definition
+    elif first_line_flag:
+        if event == cv.EVENT_LBUTTONDOWN:
+            if not rflag:
+                if pt1 == (0, 0):
+                    pt1 = x, y
+                elif pt2 == (0, 0):
+                    pt2 = x, y
+                    rflag = True
+                elif rflag:
+                    pt1 = (0, 0)
+                    pt2 = (0, 0)
+                    rflag = False
+    elif second_line_flag:
+        if event == cv.EVENT_LBUTTONDOWN:
+            if not lflag:
+                if pt3 == (0, 0):
+                    pt3 = x, y
+                elif pt4 == (0, 0):
+                    pt4 = x, y
+                    lflag = True
+                elif lflag:
+                    pt3 = (0, 0);
+                    pt4 = (0, 0)
+                    lflag = False
+
+
+# function draw circle by three points on it
+def draw_circle(event, x, y, flags, params):
+    global pc1, pc2, pc3, cflag, prc1, prc2, prc3, c1flag
+
+    if event == cv.EVENT_LBUTTONDOWN:
+        if pc1 == (0, 0):
+            pc1 = x, y
+        elif pc2 == (0, 0):
+            pc2 = x, y
+        elif pc3 == (0, 0):
+            pc3 = x, y
+            cflag = True
+        elif cflag:
+            pc1 = (0, 0);
+            pc2 = (0, 0);
+            pc3 = (0, 0)
+            cflag = False
+
+
+    elif event == cv.EVENT_RBUTTONDOWN:
+        if prc1 == (0, 0):
+            prc1 = x, y
+        elif prc2 == (0, 0):
+            prc2 = x, y
+        elif prc3 == (0, 0):
+            prc3 = x, y
+            c1flag = True
+        elif cflag:
+            prc1 = (0, 0);
+            prc2 = (0, 0);
+            prc3 = (0, 0)
+            c1flag = False
+
+
+r1 = 0
+r2 = 0
+r3 = 0
+l = 0
+creference = 0
+pv1 = (0, 0)
+pv2 = (0, 0)
+pv3 = (0, 0)
+pv4 = (0, 0)
+pt1 = (0, 0)
+pt2 = (0, 0)
+pt3 = (0, 0)
+pt4 = (0, 0)
+pc1 = (0, 0)
+pc2 = (0, 0)
+pc3 = (0, 0)
+prc1 = (0, 0)
+prc2 = (0, 0)
+prc3 = (0, 0)
+# define variables used as flag
+vRflag = False
+vLflag = False
+rflag = False
+lflag = False
+cflag = False
+c1flag = False
+# For new opt in draw lines
+first_line_flag = False
+second_line_flag = False 
+reference_flag = False
+# species
+top_points = [(0, 0), (0, 0), (0, 0), (0, 0)]
+roi_d = False
+species_mission = False
+species_hsv_flag = False
+species_img = None
+# creat an object
+
+cctv = cv.VideoCapture('rtsp://admin:admin123@192.0.0.64:554/Streaming/Channels/101')
+lowlight = cv.VideoCapture('rtsp://admin:admin123@192.0.0.64:554/Streaming/Channels/201')
+micro_cam = cv.VideoCapture('rtsp://admin:admin123@192.0.0.64:554/Streaming/Channels/301')
+# creat a resizable window
+cv.namedWindow('main_window', cv.WINDOW_NORMAL)
+cv.namedWindow('micro_window', cv.WINDOW_NORMAL)
+cv.namedWindow('lowlight_window', cv.WINDOW_NORMAL)
+
+
+#point list
+first_line_list = []
+second_line_list = []
+reference_list = []
+
+###################
+R1 = []
+R2 = []
+L = []
+inner_raduis_list = []
+img = None
+##########
+# ret, cctv_frame = cctv.read()
+# captured_frame = cctv_frame
+########
+img_c = None
+while True:
+    # read the frame using opencv functions
+
+    ret, main_frame = cctv.read()
+    ret_,lowlight_frame= lowlight.read()
+
+    ret,micro_frame = micro_cam.read()
+    key = cv.waitKey(1) & 0XFF
+    
+    
+    
+    
+    
+    
+    
+    
+    if key==ord('m'):
+        captured_frame = main_frame
+        
+    if key ==ord('n'):
+        captured_frame = lowlight_frame
+        
+    if key == ord('k'):
+        captured_frame=  micro_frame
+    ###################################
+#     lower_Value 
+    if species_hsv_flag:
+        lower_hsv = cv.getTrackbarPos('lower_mask_value','species_mask')
+        higher_hsv = cv.getTrackbarPos('higher_mask_value','species_mask')
+        bluring_val = cv.getTrackbarPos('bluring_value','species_mask')
+        threshold_min_val = cv.getTrackbarPos('thresh_value','species_mask')
+
+        species_hsv_mask,res = all_mask(species_cropped_img,(lower_hsv,lower_hsv,lower_hsv),(higher_hsv, higher_hsv, higher_hsv), bluring_val, threshold_min_val)
+        
+        cv.imshow('species_mask',species_hsv_mask)
+
+    if key ==ord('d'):
+        if species_hsv_flag:
+            
+            dst = species_hsv_mask
+            
+            kernel = np.ones((5, 5), np.uint8)
+    
+            dst = cv.erode(dst, kernel, iterations=1)
+            
+            gray = cv.cvtColor(dst,cv.COLOR_BGR2GRAY)
+    
+      
+     
+            contours, herarchy = cv.findContours(gray, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
+            r = -1
+            c = 0
+            t = 0
+            l = 0
+    
+            for cnt in contours:
+                approx = cv.approxPolyDP(cnt, 0.06* cv.arcLength(cnt, True), True)
+                cv.drawContours(bl, [approx], 0, (0, 250, 20), 3)
+                if len(approx) == 4:
+                    (x,y),(w,h),ang = cv.minAreaRect(cnt)
+                    (x,y),raduis = cv.minEnclosingCircle(cnt)
+                    if w*h > 0.5*(22/7)*(raduis**2):
+                        r += 1
+                    else:
+                        l +=1
+                        
+                elif len(approx) == 3:
+                    t += 1
+                elif len(approx) > 6:
+                    c += 1
+                else:
+                    l+=1
+    
+            cv.imshow('bl',bl)
+            print([r , c, t,l])
+            
+            
+            cv.destroyWindow('species_mask')
+            species_hsv_flag = False
+#     ###################################
+
+    if key == ord('p'):
+        cv.namedWindow('species', cv.WINDOW_NORMAL)
+        cv.setMouseCallback('species', roi)
+#         species_img = captured_frame
+        species_img = cv.imread('species_img.jpg')
+        cv.imwrite('species_img.jpg', species_img)
+        species_mission = True
+
+    if species_img is not None:
+        cv.imshow('species', species_img)
+
+        if not top_points[0] == (0, 0):
+            cv.circle(species_img, top_points[0], 1, (0, 200, 0), -1)
+
+        if not top_points[1] == (0, 0):
+            cv.circle(species_img, top_points[1], 1, (0, 200, 0), -1)
+
+        if not top_points[2] == (0, 0):
+            cv.circle(species_img, top_points[2], 1, (0, 200, 0), -1)
+
+        if not top_points[3] == (0, 0):
+            cv.circle(species_img, top_points[3], 1, (0, 200, 0), -1)
+        if roi_d and key == 32: #32 is the space key
+            bl = np.zeros_like(species_img)
+
+            # create trackbars for color change
+            cv.namedWindow('species_mask')
+            cv.createTrackbar('lower_mask_value', 'species_mask',0,255,nothing)
+            cv.createTrackbar('higher_mask_value', 'species_mask',30,255,nothing)
+            cv.createTrackbar('bluring_value', 'species_mask',1,255,nothing)
+            cv.createTrackbar('thresh_value', 'species_mask',0,255,nothing)
+            species_hsv_flag = True
+            
+            
+            cv.destroyWindow('species')
+            h, w, ch =species_img.shape
+            inverse_list = []
+            for x, y in top_points:
+                inverse_list.append((y, x))
+            inverse_list = sorted(inverse_list)
+            finall_list = []
+            for y, x in inverse_list:
+                finall_list.append((x, y))
+            upper_points = finall_list[:2]
+            bottom_points = finall_list[2:]
+            upper_points = sorted(upper_points)
+            bottom_points = sorted(bottom_points)
+            pts1 = np.float32(
+                [list(upper_points[0]), list(upper_points[1]), list(bottom_points[0]), list(bottom_points[1])])
+            pts2 = np.float32([[0, 0], [w, 0], [0, h], [w, h]])
+
+            M = cv.getPerspectiveTransform(pts1, pts2)
+            dst = cv.warpPerspective(species_img, M, (w, h))
+            
+            species_cropped_img = dst
+            
+            top_points = [(0, 0), (0, 0), (0, 0), (0, 0)]
+            roi_d = False
+            species_img = None
+            species_mission = False
+            
+            
+
+    if key == ord('f') and img is not None and not(first_line_flag):
+        first_line_flag = True
+    elif key == ord('f') and first_line_flag :
+        first_line_flag = False
+        
+    if key == ord('s') and img is not None and not(second_line_flag):
+        second_line_flag = True
+    elif key == ord('s') and second_line_flag:
+        second_line_flag = False
+        
+    if key == ord('d') and img is not None and not(reference_flag):
+        reference_flag = True
+    elif key == ord('d') and reference_flag:
+        reference_flag = False
+    if key == ord('e'):
+        first_line_flag = False
+        second_line_flag = False
+        reference_flag = False
+
+    # assign imag if pressed
+    if key == ord('l'):
+        img = captured_frame
+        cv.namedWindow('measure', cv.WINDOW_NORMAL)
+        cv.imwrite('length_image.jpg', img)
+        cv.setMouseCallback('measure', draw_lines)
+        
+        
+    if key == ord('c'):
+        img_c = captured_frame
+        cv.namedWindow('circles', cv.WINDOW_NORMAL)
+        cv.imwrite('circles.jpg', img_c)
+        cv.setMouseCallback('circles', draw_circle)
+
+    if img_c is not None and not (creference == 0):
+        cv.imshow('circles', img_c)
+        if not (pc1 == (0, 0)):
+            cv.circle(img_c, pc1, 3, (0, 200, 0), -1)
+        if not (pc2 == (0, 0)):
+            cv.circle(img_c, pc2, 3, (0, 200, 0), -1)
+        if not (pc3 == (0, 0)):
+            cv.circle(img_c, pc3, 3, (0, 200, 0), -1)
+
+        if not (prc1 == (0, 0)):
+            cv.circle(img_c, prc1, 3, (0, 0, 210), -1)
+        if not (prc2 == (0, 0)):
+            cv.circle(img_c, prc2, 3, (0, 0, 210), -1)
+        if not (prc3 == (0, 0)):
+            cv.circle(img_c, prc3, 3, (0, 0, 210), -1)
+
+    if img is not None:
+        cv.imshow('measure', img)
+        # all of condtions drawing our lines if they defined
+        if not (pt1 == (0, 0)):
+            cv.circle(img, pt1, 1, (0, 200, 0), -1)
+        if not (pt2 == (0, 0)):
+            cv.circle(img, pt2, 1, (0, 200, 0), -1)
+        if rflag:
+            cv.line(img, pt1, pt2, (0, 255, 0), 1, cv.LINE_AA)
+        if not (pt3 == (0, 0)):
+            cv.circle(img, pt3, 1, (255, 0, 0), -1)
+        if not (pt4 == (0, 0)):
+            cv.circle(img, pt4, 1, (255, 0, 0), -1)
+        if lflag:
+            cv.line(img, pt3, pt4, (255, 0, 0), 1, cv.LINE_AA)
+
+        if not (pv1 == (0, 0)):
+            cv.circle(img, pv1, 1, (0, 0, 210), -1)
+        if not (pv2 == (0, 0)):
+            cv.circle(img, pv2, 1, (0, 0, 210), -1)
+        if not (pv3 == (0, 0)):
+            cv.circle(img, pv3, 1, (0, 0, 210), -1)
+        if vRflag:
+            cv.line(img, pv1, pv2, (0, 0, 210), 1, cv.LINE_AA)
+        if vLflag:
+            cv.line(img, pv3, pv4, (0, 0, 210), 1, cv.LINE_AA)
+            
+            
+            
+    #this add points to it's list to average them later on 
+    if key == ord('a'):
+        if first_line_flag:
+            if rflag:
+                first_line_list.append((pt1,pt2))
+                img = cv.imread('Length_image.jpg')
+                pt1 = (0, 0)
+                pt2 = (0, 0)
+                rflag = False
+
+        elif second_line_flag:
+            if lflag:
+                second_line_list.append((pt3,pt4))
+                img = cv.imread('Length_image.jpg')
+                pt3 = (0, 0)
+                pt4 = (0, 0)
+                lflag = False
+
+
+        elif reference_flag:
+            if vRflag and vLflag:
+                v1 = get_vector(pv1, pv2)
+                v2 = get_vector(pv2, pv1)
+                v3 = get_vector(pv3, pv4)
+                v4 = get_vector(pv4, pv3)
+                vectors_1_1 = [get_vector(pv1, pv3), get_vector(pv1, pv4)]
+                vectors_1_2 = [get_vector(pv2, pv3), get_vector(pv2, pv4)]
+                vectors_2_1 = [get_vector(pv3, pv1), get_vector(pv3, pv2)]
+                vectors_2_2 = [get_vector(pv4, pv1), get_vector(pv4, pv2)]
+                lift_rectangle_areas_Reference = []
+                right_rectangle_areas_Reference = []
+                for v in vectors_1_1:
+                    right_rectangle_areas_Reference.append(vectors_multiplication(v, v1))
+                for v in vectors_1_2:
+                    right_rectangle_areas_Reference.append(vectors_multiplication(v, v2))
+                for v in vectors_2_1:
+                    lift_rectangle_areas_Reference.append(vectors_multiplication(v, v3))
+                for v in vectors_2_2:
+                    lift_rectangle_areas_Reference.append(vectors_multiplication(v, v4))
+
+                for area in lift_rectangle_areas_Reference:
+                    reference_list.append(area / distance(pv3, pv4))
+                for area in right_rectangle_areas_Reference:
+                    reference_list.append(area / distance(pv1, pv2))
+                    
+                pv1 = (0, 0)
+                pv2 = (0, 0)
+                pv3 = (0, 0)
+                pv4 = (0, 0)
+                vRflag = False
+                vLflag = False 
+                img = cv.imread('Length_image.jpg')
+
+                    
+        if cflag and c1flag:
+            c_param = circle_eq(pc1, pc2, pc3)
+            c1_param = circle_eq(prc1, prc2, prc3)
+            c_raduis_sq = ((0.5 * c_param[0]) ** 2) + ((0.5 * c_param[1]) ** 2) - c_param[2]
+            c1_raduis_sq = ((0.5 * c1_param[0]) ** 2) + ((0.5 * c1_param[1]) ** 2) - c1_param[2]
+
+            inner_raduis_list.append(np.sqrt((creference ** 2) * (c_raduis_sq / c1_raduis_sq)))
+            cflag = False
+            c1flag = False
+            pc1 = (0, 0)
+            pc2 = (0, 0)
+            pc3 = (0, 0)
+            prc1 = (0, 0)
+            prc2 = (0, 0)
+            prc3 = (0, 0)
+            img_c = cv.imread('circles.jpg')
+
+
+
+
+    if key == ord('r'):
+
+        if species_mission:
+            species_img = cv.imread('species_img.jpg')
+            top_points = [(0, 0), (0, 0), (0, 0), (0, 0)]
+            roi_d = False
+
+        if img is not None:
+            pv1 = (0, 0)
+            pv2 = (0, 0)
+            pv3 = (0, 0)
+            pv4 = (0, 0)
+            pt1 = (0, 0)
+            pt2 = (0, 0)
+            pt3 = (0, 0)
+            pt4 = (0, 0)
+            vRflag = False
+            vRflag = False
+            rflag = False
+            lflag = False
+            img = cv.imread('length_image.jpg')
+        if img_c is not None:
+            pc1 = (0, 0)
+            pc2 = (0, 0)
+            pc3 = (0, 0)
+            prc1 = (0, 0)
+            prc2 = (0, 0)
+            prc3 = (0, 0)
+            cflag = False
+            c1flag = False
+            img_c = cv.imread('circles.jpg')
+
+    if key == 32:  # 32 is the space key
+        if not (len(reference_list) == 0 and len(first_line_list)==0 and len(second_line_list)==0):
+            width_av = np.average(reference_list)
+            for pt1,pt2 in first_line_list:
+                for pt3,pt4 in second_line_list:
+                    vl1 = get_vector(pt1, pt2)
+                    vl2 = get_vector(pt2, pt1)
+                    vl3 = get_vector(pt3, pt4)
+                    vl4 = get_vector(pt4, pt3)
+                    lines_vectors_1_1 = [get_vector(pt1, pt3), get_vector(pt1, pt4)]
+                    lines_vectors_1_2 = [get_vector(pt2, pt3), get_vector(pt2, pt4)]
+                    lines_vectors_2_1 = [get_vector(pt3, pt1), get_vector(pt3, pt2)]
+                    lines_vectors_2_2 = [get_vector(pt4, pt1), get_vector(pt4, pt2)]
+                    lift_rectangle_areas = []
+                    right_rectangle_areas = []
+                    for v in lines_vectors_1_1:
+                        right_rectangle_areas.append(vectors_multiplication(v, vl1))
+                    for v in lines_vectors_1_2:
+                        right_rectangle_areas.append(vectors_multiplication(v, vl2))
+                    for v in lines_vectors_2_1:
+                        lift_rectangle_areas.append(vectors_multiplication(v, vl3))
+                    for v in lines_vectors_2_2:
+                        lift_rectangle_areas.append(vectors_multiplication(v, vl4))
+    
+                    length_list = []
+    
+                    length_list.append(distance(get_mid(pt1, pt2), get_mid(pt3, pt4)))
+                    for area in lift_rectangle_areas:
+                        length_list.append(area / distance(pt3, pt4))
+                    for area in right_rectangle_areas:
+                        length_list.append(area / distance(pt1, pt2))
+                    length_av = np.average(length_list)
+                    
+                    if distance(pt1, pt2) > distance(pt3, pt4): 
+                        r1p = distance(pt1, pt2)
+                        r2p = distance(pt3, pt4)
+                    else :
+                        r1p = distance(pt3, pt4)
+                        r2p = distance(pt1, pt2)
+
+                    r1 = ((r1p * tl) / width_av) / 2
+                    r2 = ((r2p * tl) / width_av) / 2
+                    l = (length_av * tl) / width_av
+                    L.append(l)
+                    R1.append(r1)
+                    R2.append(r2)   
+            
+            r1_av = np.average(R1)
+            r2_av = np.average(R2)
+            l_av = np.average(L)
+         
+            if r1_av > r2_av:
+                creference = r2_av
+            elif r1_av < r2_av:
+                creference = r1_av
+                
+            R1_output = round_up(r1_av, 2)
+            R2_output = round_up(r2_av, 2)
+            L_output = round_up(l_av, 2)
+
+            cv.destroyWindow('measure')
+            img = None
+            print('R1 = ', R1_output, ' cm')
+            print('R2 = ', R2_output, ' cm')
+            print('Length = ', L_output, ' cm')
+            R1 = []
+            R2 = []
+            L = []
+            first_line_list = []
+            second_line_list = []
+            reference_list = []
+            first_line_flag = False
+            second_line_flag = False
+            reference_flag = False
+        elif not (len(inner_raduis_list) == 0):
+            inner_raduis_av = np.average(inner_raduis_list)
+            inner_raduis = round_up(inner_raduis_av, 2)
+            cv.destroyWindow('circles')
+            img_c = None
+            print('Inner raduis = ', inner_raduis, ' cm')
+
+            inner_raduis_list = []
+            creference = 0
+
+            
+    if key == ord('q'):
+    
+        break
+
+    cv.imshow('main_window', main_frame)
+    cv.imshow('micro_window',micro_frame)
+    cv.imshow('lowlight_window',lowlight_frame)
+cctv.release()
+lowlight.release()
+micro_cam.release()
+cv.destroyAllWindows()
+
+
